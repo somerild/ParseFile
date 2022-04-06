@@ -17,33 +17,36 @@ public class ParseFile {
             sourcePath = args[0];
             numberOfRecords = Integer.valueOf( args[1] );
             destinationPath = args[2];
-            File f = new File( sourcePath );
-            if ( ! f.exists( ) )
+
+            File fIn = new File( sourcePath );
+            File fOut = new File(destinationPath);
+            PrintWriter output = new PrintWriter( new FileWriter( fOut, true ) );
+
+            if ( ! fIn.exists( ) )
             {
                 System.out.println("Source file does not exist." );
                 System.exit( 1 );
             }
-            try(BufferedReader input = new BufferedReader( new FileReader( f ) ) )
+            try(BufferedReader input = new BufferedReader( new FileReader( fIn ) ) )
             {
                 String record = null;
                 String state = null;
-                Float population = 0F;
-                Float childPopulation = 0F;
-                Float childPovertyPopulation = 0F;
+                String population = null;
+                String childPopulation = null;
+                String childPovertyPopulation = null;
+
+                output.printf("%5s %10s %16s %24s%n", "State", "Population", "Child Population", "Child Poverty Population");
 
                 for(int i = 0; i < numberOfRecords; i++)
                 {
                     record = input.readLine();
-                    state = record.substring( 0,2 );
-                    System.out.println(state );
-                    population = Float.parseFloat(record.substring( 82, 90 ));
-                    System.out.println(population );
-                    childPopulation = Float.parseFloat( record.substring( 91, 99 ) );
-                    System.out.println(childPopulation );
-                    childPovertyPopulation = Float.parseFloat( record.substring( 100, 108 ) );
-                    System.out.println(childPovertyPopulation );
-
+                    state = record.substring(0,2);
+                    population = record.substring( 82, 90 );
+                    childPopulation = record.substring( 91, 99 );
+                    childPovertyPopulation = record.substring( 100, 108 );
+                    output.printf("%5s %10s %16s %24s%n", state, population, childPopulation, childPovertyPopulation);
                 }
+                output.close();
             }
         }
         catch ( Exception e )

@@ -15,19 +15,18 @@ public class ParseFile {
         BufferedReader input; //FileReader to read source file
         PrintWriter output; //PrintWriter to write to destination file
 
-        //set arguments from the command line
+        //verify the right number of arguments and set
         try
         {
             sourcePath = args[0];
-            if (sourcePath == null) throw new IllegalArgumentException( "Source file path is required." );
             numberOfRecords = Integer.parseInt( args[1] );
             if(numberOfRecords == 0) throw new IllegalArgumentException( "Number of records is required." );
             if(numberOfRecords <= 0) throw new IllegalArgumentException( "Invalid number of records." );
             destinationPath = args[2];
-            if(destinationPath == null) throw new IllegalArgumentException( "Destination file path and name is required." );
         }
-        catch (IllegalArgumentException e )
+        catch (Exception e )
         {
+            System.out.println("Missing or invalid parameters.");
             e.printStackTrace();
             System.exit( 1 );
         }
@@ -42,7 +41,7 @@ public class ParseFile {
         }
         catch(Exception e1)
         {
-            e1.printStackTrace(  );
+            e1.printStackTrace();
             System.exit( 1 );
         }
 
@@ -70,7 +69,7 @@ public class ParseFile {
             }
             input.close();
             output.close();
-        }catch(IOException e2)
+        }catch(Exception e2)
         {
             e2.printStackTrace();
         }

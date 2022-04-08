@@ -6,79 +6,73 @@ public class ParseFile {
 
     public static void main(String[] args)
     {
-        String sourcePath; // data source file path
-        String destinationPath; // destination file path
-        int numberOfRecords; //number of records in the data source
+        String sourcePath = null; // data source file path
+        String destinationPath = null; // destination file path
+        int numberOfRecords = 0; //number of records in the data source
 
+        File in = null; //source file
+        File out = null; //destination file
+        BufferedReader input; //FileReader to read source file
+        PrintWriter output; //PrintWriter to write to destination file
+
+        //set arguments from the command line
         try
         {
-            if ( args.length < 3 ) throw new IllegalArgumentException( "Three arguments are required. " +
-                    "source file path, number of records, destination file path." );
-
-            //set arg inputs
-            sourcePath = args[ 0 ];
-            numberOfRecords = Integer.parseInt( args[ 1 ] );
-            destinationPath = args[ 2 ];
-
-            //create file objects with source and destination inputs
-            File fIn = new File( sourcePath );
-            File fOut = new File( destinationPath );
-
-            //source file check
-            if ( ! fIn.exists( ) )
-            {
-                System.out.println("Source file not found." );
-                System.exit( 1 );
-            }
-            if(!fIn.canRead())
-            {
-                System.out.println("Cannot read source file." );
-                System.exit( 1 );
-            }
-
-            try(BufferedReader input = new BufferedReader( new FileReader( fIn ) ) )
-            {
-                String record;
-                String state;
-                String population;
-                String childPopulation;
-                String childPovertyPopulation;
-
-                try(PrintWriter output = new PrintWriter( new FileWriter( fOut, true ) ))
-                {
-                    //destination file check
-                    if(!fOut.canWrite())
-                    {
-                        System.out.println("Cannot write to destination file." );
-                        System.exit( 1 );
-                    }
-                    //print file header
-                    output.printf("%5s %10s %16s %24s%n", "State", "Population", "Child Population", "Child Poverty Population");
-
-                    //loop through records
-                    for(int i = 0; i < numberOfRecords; i++)
-                    {
-                        record = input.readLine();
-                        state = record.substring(0,2).trim();
-                        population = record.substring( 82, 90 ).trim();
-                        childPopulation = record.substring( 91, 99 ).trim();
-                        childPovertyPopulation = record.substring( 100, 108 ).trim();
-
-                        //print record to file
-                        output.printf("%5s %10s %16s %24s%n", state, population, childPopulation, childPovertyPopulation);
-                    }
-                }
-            }
-            catch(IOException e1)
-            {
-                e1.printStackTrace();
-                System.exit( 1 );
-            }
+            sourcePath = args[0];
+            if (sourcePath == null) throw new IllegalArgumentException( "Source file path is required." );
+            numberOfRecords = Integer.parseInt( args[1] );
+            if(numberOfRecords == 0) throw new IllegalArgumentException( "Number of records is required." );
+            if(numberOfRecords <= 0) throw new IllegalArgumentException( "Invalid number of records." );
+            destinationPath = args[2];
+            if(destinationPath == null) throw new IllegalArgumentException( "Destination file path and name is required." );
         }
-        catch ( IllegalArgumentException e0 )
+        catch (IllegalArgumentException e )
         {
-            e0.printStackTrace();
+            e.printStackTrace();
             System.exit( 1 );
+        }
+
+        //create file objects, verify
+        try
+        {
+            in = new File( sourcePath );
+            if(!in.exists()) throw new FileNotFoundException( "File does not exist." );
+            if(!in.canRead()) throw new IOException( "Cannot read file." );
+            out = new File( destinationPath );
+        }
+        catch(Exception e1)
+        {
+            e1.printStackTrace(  );
+            System.exit( 1 );
+        }
+
+        //read from source and write to destination line by line
+        try
+        {
+            input = new BufferedReader(
+                    new FileReader( in ) );
+            output = new PrintWriter( new BufferedWriter( new FileWriter( out, true ) ));
+            if ( !out.exists( ) ) throw new FileNotFoundException( "File not created." );
+            if (!out.canWrite()) throw new IOException( "File is not writable." );
+
+            //destination file header
+            output.printf("%-5s\t%-10s\t%-16s\t%-24s%n", "State", "Population", "Child Population", "Child Poverty Population");
+
+            for(int i = 0; i < numberOfRecords; i++)
+            {
+                String line = input.readLine( );
+                String stateCode = line.substring( 0,3 ).trim();
+                String population = line.substring( 71, 91).trim();
+                String childPopulation = line.substring(91,100).trim();
+                String childPovertyPopulation = line.substring( 100,109 ).trim();
+
+                output.printf( "%-5s\t%-10s\t%-16s\t%-24s%n", stateCode, population, childPopulation, childPovertyPopulation);
+            }
+            input.close();
+            output.close();
+        }catch(IOException e2)
+        {
+            e2.printStackTrace();
         }
     }
 }

@@ -61,7 +61,7 @@ public class ParseFile {
             {
                 String line = input.readLine( );
                 String stateCode = line.substring( 0,3 ).trim();
-                String population = line.substring( 71, 91).trim();
+                String population = line.substring( 79, 91).trim();
                 String childPopulation = line.substring(91,100).trim();
                 String childPovertyPopulation = line.substring( 100,109 ).trim();
 
